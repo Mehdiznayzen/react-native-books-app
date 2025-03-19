@@ -17,7 +17,7 @@ interface GlobalProviderProps {
 }
 
 export const GlobalProvider = ({ children }: GlobalProviderProps) => {
-    const [isLogged, setIsLogged] = useState<boolean>(true);
+    const [isLogged, setIsLogged] = useState<boolean>(false);
     const [user, setUser] = useState<Object | null>({});
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -26,6 +26,7 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
             setLoading(true);
 
             const { data, error } = await supabase.auth.getSession();
+            console.log(data.session)
             if (error) throw error;
 
             if (data.session?.user) {
@@ -34,7 +35,7 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
                 router.push("/");
             } else {
                 setUser(null);
-                setIsLogged(true);
+                setIsLogged(false);
             }
         } catch (error: any) {
             Alert.alert("Error", error.message);
