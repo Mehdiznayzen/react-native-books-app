@@ -1,16 +1,40 @@
-import { Image, ScrollView, Text, View } from 'react-native'
+import { Alert, Image, ScrollView, Text, View } from 'react-native'
 import { AuthImg } from '@/constants/images'
 import { useState } from 'react'
 import CustomInput from '@/components/CustomInput'
 import { email, lock } from "@/constants/icons"
 import CustomButton from '@/components/CustomButton'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
+import { supabase } from '@/lib/supabase'
 
 const SignIn = () => {
     const [formValues, setFormValues] = useState({ email: "", password: "" })
+    const [loading, setLoading] = useState(false)
 
     const handleSignIn = async () => {
-        console.log(formValues)
+        if (!formValues.email || !formValues.password) {
+            Alert.alert("Error", "All fields are required!");
+            return;
+        }
+        
+        try {
+            setLoading(true)
+            const { data: { user }, error } = await supabase.auth.signInWithPassword({
+                email: formValues.email,
+                password: formValues.password,
+            });
+
+            if(error){
+                Alert.alert('Error', error.message)
+            }
+            if(user){
+                router.push("/");
+            }
+        } catch (error: any) {
+            Alert.alert(error.message);
+        }finally {
+            setLoading(false);
+        }
     }
 
     return (

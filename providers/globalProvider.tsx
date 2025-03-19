@@ -1,5 +1,7 @@
+import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { createContext, useContext, ReactNode, useState, useEffect } from "react";
+import { Alert } from "react-native";
 
 interface GlobalContextType {
     isLogged: boolean;
@@ -15,9 +17,35 @@ interface GlobalProviderProps {
 }
 
 export const GlobalProvider = ({ children }: GlobalProviderProps) => {
-    const [isLogged, setIsLogged] = useState(false);
+    const [isLogged, setIsLogged] = useState<boolean>(true);
     const [user, setUser] = useState<Object | null>({});
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleLoginUser = async () => {
+        try {
+            setLoading(true);
+
+            const { data, error } = await supabase.auth.getSession();
+            if (error) throw error;
+
+            if (data.session?.user) {
+                setUser(data.session.user);
+                setIsLogged(true);
+                router.push("/");
+            } else {
+                setUser(null);
+                setIsLogged(true);
+            }
+        } catch (error: any) {
+            Alert.alert("Error", error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        handleLoginUser();
+    }, [user]);
 
     return (
         <GlobalContext.Provider

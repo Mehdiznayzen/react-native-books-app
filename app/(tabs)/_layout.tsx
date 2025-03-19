@@ -46,7 +46,7 @@ export default function TabsLayout() {
 
     useEffect(() => {
         if (isAppReady && !isLogged) {
-            router.replace("/(auth)/sign-in");
+            router.replace("/(auth)/sign-up");
         }
     }, [isAppReady, isLogged]);
 
